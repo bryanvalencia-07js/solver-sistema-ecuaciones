@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Solver de Sistemas Lineales</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <h1>Solver de Sistemas de Ecuaciones Lineales</h1>
+
+    <p>
+        Resuelve sistemas 2×2 y 3×3 mediante métodos de Álgebra Lineal.
+    </p>
+
+</header>
+
+
+<main class="container">
+
+
+    <!-- =====================================================
+         FORMULARIO PRINCIPAL
+         ===================================================== -->
+
+    <section class="card">
+
+        <h2>Introduce el sistema</h2>
+
+        <p class="description">
+            Selecciona el signo y luego escribe el valor de cada coeficiente.
+        </p>
+
+
+        <form method="POST">
+
+
+            <!-- =================================================
+                 CONFIGURACIÓN
+                 ================================================= -->
+
+            <div class="configuration">
+
+                <div class="form-group">
+
+                    <label for="dimension">
+                        Número de ecuaciones
+                    </label>
+
+                    <select
+                        name="dimension"
+                        id="dimension"
+                    >
+
+                        <option value="2">
+                            2 ecuaciones — 2 incógnitas
+                        </option>
+
+                        <option
+                            value="3"
+                            {% if resultado and resultado.dimension == 3 %}
+                                selected
+                            {% endif %}
+                        >
+                            3 ecuaciones — 3 incógnitas
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="metodo">
+                        Método de resolución
+                    </label>
+
+                    <select
+                        name="metodo"
+                        id="metodo"
+                    >
+
+                        <option
+                            value="cramer"
+                            {% if resultado and resultado.metodo == "cramer" %}
+                                selected
+                            {% endif %}
+                        >
+                            Regla de Cramer
+                        </option>
+
+
+                        <option
+                            value="gauss"
+                            {% if resultado and resultado.metodo == "gauss" %}
+                                selected
+                            {% endif %}
+                        >
+                            Eliminación de Gauss
+                        </option>
+
+
+                        <option
+                            value="numpy"
+                            {% if resultado and resultado.metodo == "numpy" %}
+                                selected
+                            {% endif %}
+                        >
+                            NumPy Solve
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SISTEMA 2x2
+                 ================================================= -->
+
+            <div
+                id="sistema-2x2"
+                class="system-container"
+            >
+
+                <h3>Sistema 2×2</h3>
+
+
+                <!-- ECUACIÓN 1 -->
+
+                <div class="equation">
+
+
+                    <!-- a11 -->
+
+                    <select
+                        name="sign_a11"
+                        class="input-2x2 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a11"
+                        class="input-2x2 coefficient"
+                        placeholder="2"
+                    >
+
+                    <span class="variable">
+                        x
+                    </span>
+
+
+
+                    <!-- a12 -->
+
+                    <select
+                        name="sign_a12"
+                        class="input-2x2 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a12"
+                        class="input-2x2 coefficient"
+                        placeholder="3"
+                    >
+
+                    <span class="variable">
+                        y
+                    </span>
+
+
+
+                    <!-- = -->
+
+                    <span class="equal">
+                        =
+                    </span>
+
+
+
+                    <!-- b1 -->
+
+                    <select
+                        name="sign_b1"
+                        class="input-2x2 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="b1"
+                        class="input-2x2 result-input"
+                        placeholder="7"
+                    >
+
+                </div>
+
+
+
+                <!-- ECUACIÓN 2 -->
+
+                <div class="equation">
+
+
+                    <!-- a21 -->
+
+                    <select
+                        name="sign_a21"
+                        class="input-2x2 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a21"
+                        class="input-2x2 coefficient"
+                        placeholder="4"
+                    >
+
+                    <span class="variable">
+                        x
+                    </span>
+
+
+
+                    <!-- a22 -->
+
+                    <select
+                        name="sign_a22"
+                        class="input-2x2 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a22"
+                        class="input-2x2 coefficient"
+                        placeholder="1"
+                    >
+
+                    <span class="variable">
+                        y
+                    </span>
+
+
+
+                    <span class="equal">
+                        =
+                    </span>
+
+
+
+                    <!-- b2 -->
+
+                    <select
+                        name="sign_b2"
+                        class="input-2x2 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="b2"
+                        class="input-2x2 result-input"
+                        placeholder="5"
+                    >
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SISTEMA 3x3
+                 ================================================= -->
+
+            <div
+                id="sistema-3x3"
+                class="system-container"
+            >
+
+                <h3>Sistema 3×3</h3>
+
+
+                <!-- =================================================
+                     ECUACIÓN 1
+                     ================================================= -->
+
+                <div class="equation">
+
+
+                    <!-- a11 -->
+
+                    <select
+                        name="sign_a11"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a11"
+                        class="input-3x3 coefficient"
+                    >
+
+                    <span class="variable">
+                        x
+                    </span>
+
+
+
+                    <!-- a12 -->
+
+                    <select
+                        name="sign_a12"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a12"
+                        class="input-3x3 coefficient"
+                    >
+
+                    <span class="variable">
+                        y
+                    </span>
+
+
+
+                    <!-- a13 -->
+
+                    <select
+                        name="sign_a13"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a13"
+                        class="input-3x3 coefficient"
+                    >
+
+                    <span class="variable">
+                        z
+                    </span>
+
+
+
+                    <span class="equal">
+                        =
+                    </span>
+
+
+
+                    <!-- b1 -->
+
+                    <select
+                        name="sign_b1"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="b1"
+                        class="input-3x3 result-input"
+                    >
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ECUACIÓN 2
+                     ================================================= -->
+
+                <div class="equation">
+
+
+                    <!-- a21 -->
+
+                    <select
+                        name="sign_a21"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a21"
+                        class="input-3x3 coefficient"
+                    >
+
+                    <span class="variable">
+                        x
+                    </span>
+
+
+
+                    <!-- a22 -->
+
+                    <select
+                        name="sign_a22"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a22"
+                        class="input-3x3 coefficient"
+                    >
+
+                    <span class="variable">
+                        y
+                    </span>
+
+
+
+                    <!-- a23 -->
+
+                    <select
+                        name="sign_a23"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a23"
+                        class="input-3x3 coefficient"
+                    >
+
+                    <span class="variable">
+                        z
+                    </span>
+
+
+
+                    <span class="equal">
+                        =
+                    </span>
+
+
+
+                    <!-- b2 -->
+
+                    <select
+                        name="sign_b2"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="b2"
+                        class="input-3x3 result-input"
+                    >
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ECUACIÓN 3
+                     ================================================= -->
+
+                <div class="equation">
+
+
+                    <!-- a31 -->
+
+                    <select
+                        name="sign_a31"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a31"
+                        class="input-3x3 coefficient"
+                    >
+
+                    <span class="variable">
+                        x
+                    </span>
+
+
+
+                    <!-- a32 -->
+
+                    <select
+                        name="sign_a32"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a32"
+                        class="input-3x3 coefficient"
+                    >
+
+                    <span class="variable">
+                        y
+                    </span>
+
+
+
+                    <!-- a33 -->
+
+                    <select
+                        name="sign_a33"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="a33"
+                        class="input-3x3 coefficient"
+                    >
+
+                    <span class="variable">
+                        z
+                    </span>
+
+
+
+                    <span class="equal">
+                        =
+                    </span>
+
+
+
+                    <!-- b3 -->
+
+                    <select
+                        name="sign_b3"
+                        class="input-3x3 sign-selector"
+                    >
+                        <option value="1">+</option>
+                        <option value="-1">−</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        name="b3"
+                        class="input-3x3 result-input"
+                    >
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 BOTÓN
+                 ================================================= -->
+
+            <button
+                type="submit"
+                class="solve-button"
+            >
+                Resolver sistema
+            </button>
+
+
+        </form>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         ERROR
+         ===================================================== -->
+
+    {% if error %}
+
+        <section class="card error-card">
+
+            <h2>Error</h2>
+
+            <p>
+                {{ error }}
+            </p>
+
+        </section>
+
+    {% endif %}
+
+
+
+    <!-- =====================================================
+         RESULTADO
+         ===================================================== -->
+
+    {% if resultado %}
+
+        <section class="card">
+
+            <h2>Resultado</h2>
+
+
+            {% if resultado.estado == "unica" %}
+
+                <div class="status success">
+
+                    Sistema compatible determinado:
+                    existe una única solución.
+
+                </div>
+
+
+                <div class="solution">
+
+                    <h3>Solución</h3>
+
+
+                    <div class="solution-values">
+
+                        <div>
+                            <strong>x =</strong>
+                            {{ "%.4f"|format(resultado.solucion[0]) }}
+                        </div>
+
+
+                        <div>
+                            <strong>y =</strong>
+                            {{ "%.4f"|format(resultado.solucion[1]) }}
+                        </div>
+
+
+                        {% if resultado.dimension == 3 %}
+
+                            <div>
+                                <strong>z =</strong>
+                                {{ "%.4f"|format(resultado.solucion[2]) }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+            {% elif resultado.estado == "infinitas" %}
+
+                <div class="status warning">
+
+                    El sistema tiene infinitas soluciones.
+
+                </div>
+
+
+            {% else %}
+
+                <div class="status error">
+
+                    El sistema no tiene solución.
+
+                </div>
+
+            {% endif %}
+
+
+
+            <!-- =================================================
+                 INFORMACIÓN MATEMÁTICA
+                 ================================================= -->
+
+            <div class="math-info">
+
+
+                <div>
+
+                    <strong>
+                        Determinante
+                    </strong>
+
+                    <br>
+
+                    {{ "%.4f"|format(resultado.determinante) }}
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Rango de A
+                    </strong>
+
+                    <br>
+
+                    {{ resultado.rango_A }}
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Rango de [A | b]
+                    </strong>
+
+                    <br>
+
+                    {{ resultado.rango_aumentada }}
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Método
+                    </strong>
+
+                    <br>
+
+                    {% if resultado.metodo == "cramer" %}
+
+                        Regla de Cramer
+
+                    {% elif resultado.metodo == "gauss" %}
+
+                        Eliminación de Gauss
+
+                    {% else %}
+
+                        NumPy Solve
+
+                    {% endif %}
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 MATRIZ A
+                 ================================================= -->
+
+            <div class="result-block">
+
+                <h3>Matriz de coeficientes A</h3>
+
+
+                <div class="result-matrix">
+
+                    {% for fila in resultado.matriz_A %}
+
+                        <div class="result-row">
+
+                            {% for valor in fila %}
+
+                                <span>
+                                    {{ "%.2f"|format(valor) }}
+                                </span>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    {% endif %}
+
+
+
+    <!-- =====================================================
+         GRÁFICA
+         ===================================================== -->
+
+    {% if grafica %}
+
+        <section class="card graph-card">
+
+            <h2>
+                Representación gráfica
+            </h2>
+
+
+            <img
+                src="data:image/png;base64,{{ grafica }}"
+                alt="Representación gráfica del sistema"
+                class="graph-image"
+            >
+
+        </section>
+
+    {% endif %}
+
+
+</main>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT DE INTERFAZ
+     ========================================================= -->
+
+<script>
+
+    const dimension =
+        document.getElementById("dimension");
+
+
+    const sistema2 =
+        document.getElementById("sistema-2x2");
+
+
+    const sistema3 =
+        document.getElementById("sistema-3x3");
+
+
+    const inputs2 =
+        document.querySelectorAll(".input-2x2");
+
+
+    const inputs3 =
+        document.querySelectorAll(".input-3x3");
+
+
+
+    function actualizarSistema() {
+
+
+        if (dimension.value === "2") {
+
+
+            sistema2.style.display = "block";
+
+            sistema3.style.display = "none";
+
+
+            inputs2.forEach(input => {
+
+                input.disabled = false;
+
+                input.required = true;
+
+            });
+
+
+            inputs3.forEach(input => {
+
+                input.disabled = true;
+
+                input.required = false;
+
+            });
+
+
+        } else {
+
+
+            sistema2.style.display = "none";
+
+            sistema3.style.display = "block";
+
+
+            inputs2.forEach(input => {
+
+                input.disabled = true;
+
+                input.required = false;
+
+            });
+
+
+            inputs3.forEach(input => {
+
+                input.disabled = false;
+
+                input.required = true;
+
+            });
+
+        }
+
+    }
+
+
+    dimension.addEventListener(
+        "change",
+        actualizarSistema
+    );
+
+
+    actualizarSistema();
+
+</script>
+
+
+</body>
+
+</html>
