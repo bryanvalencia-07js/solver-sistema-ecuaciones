@@ -82,8 +82,8 @@ proyecto/
 ### 1. Clonar el repositorio
 
 ```bash
-git clone URL_DEL_REPOSITORIO
-cd NOMBRE_DEL_PROYECTO
+git clone https://github.com/bryanvalencia-07js/solver-sistema-ecuaciones
+cd solver-sistema-ecuaciones
 ```
 
 ### 2. Crear un entorno virtual
