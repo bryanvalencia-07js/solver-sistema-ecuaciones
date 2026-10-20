@@ -104,6 +104,65 @@ def clasificar_sistema(A, b):
 
     return estado, rango_A, rango_aumentada
 
+# ============================================================
+# SARRUS
+# ============================================================
+
+
+def determinante_sarrus(matriz):
+    """
+    Calcula el determinante de una matriz 3x3
+    utilizando la Regla de Sarrus.
+
+    Matriz:
+
+        | a  b  c |
+        | d  e  f |
+        | g  h  i |
+
+    Determinante:
+
+        D = aei + bfg + cdh
+            - ceg - bdi - afh
+    """
+
+    # Verificamos que realmente sea una matriz 3x3.
+    if matriz.shape != (3, 3):
+        raise ValueError(
+            "La regla de Sarrus solo funciona con matrices 3x3."
+        )
+
+    # Extraemos cada elemento de la matriz.
+    a = matriz[0, 0]
+    b = matriz[0, 1]
+    c = matriz[0, 2]
+
+    d = matriz[1, 0]
+    e = matriz[1, 1]
+    f = matriz[1, 2]
+
+    g = matriz[2, 0]
+    h = matriz[2, 1]
+    i = matriz[2, 2]
+
+    # Diagonales descendentes.
+    positivas = (
+        a * e * i
+        + b * f * g
+        + c * d * h
+    )
+
+    # Diagonales ascendentes.
+    negativas = (
+        c * e * g
+        + b * d * i
+        + a * f * h
+    )
+
+    determinante = positivas - negativas
+
+    return determinante
+
 
 # ============================================================
 # MÉTODO DE CRAMER
@@ -125,7 +184,10 @@ def resolver_cramer(A, b):
         Di = determinante reemplazando una columna por b
     """
 
-    determinante_A = np.linalg.det(A)
+    if A.shape == (3, 3):
+        determinante_A = determinante_sarrus(A)
+    else:
+        determinante_A = np.linalg.det(A)
 
     # Debido a que trabajamos con números decimales,
     # usamos np.isclose() en lugar de comparar directamente con 0.
@@ -146,7 +208,10 @@ def resolver_cramer(A, b):
         Ai[:, columna] = b
 
         # Calculamos el determinante de la nueva matriz.
-        Di = np.linalg.det(Ai)
+        if Ai.shape == (3, 3):
+            Di = determinante_sarrus(Ai)
+        else:
+            Di = np.linalg.det(Ai)
 
         determinantes.append(Di)
 
