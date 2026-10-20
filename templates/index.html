@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,12 +11,15 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Solver de Sistemas Lineales</title>
+    <title>
+        Solver de Sistemas Lineales
+    </title>
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='style.css') }}"
     >
+
 </head>
 
 
@@ -23,10 +28,13 @@
 
 <header class="header">
 
-    <h1>Solver de Sistemas de Ecuaciones Lineales</h1>
+    <h1>
+        Solver de Sistemas de Ecuaciones Lineales
+    </h1>
 
     <p>
-        Resuelve sistemas 2×2 y 3×3 mediante métodos de Álgebra Lineal.
+        Sistemas 2×2, 3×3 y determinantes
+        mediante la Regla de Sarrus.
     </p>
 
 </header>
@@ -36,49 +44,128 @@
 
 
     <!-- =====================================================
-         FORMULARIO PRINCIPAL
+         FORMULARIO
          ===================================================== -->
 
     <section class="card">
 
-        <h2>Introduce el sistema</h2>
 
-        <p class="description">
-            Selecciona el signo y luego escribe el valor de cada coeficiente.
-        </p>
+        <h2>
+            Operación matemática
+        </h2>
 
 
         <form method="POST">
 
 
             <!-- =================================================
-                 CONFIGURACIÓN
+                 OPERACIÓN
                  ================================================= -->
 
-            <div class="configuration">
+            <div class="form-group">
+
+                <label for="operacion">
+
+                    ¿Qué deseas calcular?
+
+                </label>
+
+
+                <select
+                    name="operacion"
+                    id="operacion"
+                >
+
+                    <option
+                        value="sistema"
+
+                        {% if operacion == "sistema" %}
+                            selected
+                        {% endif %}
+                    >
+
+                        Resolver sistema de ecuaciones
+
+                    </option>
+
+
+                    <option
+                        value="sarrus"
+
+                        {% if operacion == "sarrus" %}
+                            selected
+                        {% endif %}
+                    >
+
+                        Determinante 3×3 — Regla de Sarrus
+
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 CONFIGURACIÓN DEL SISTEMA
+                 ================================================= -->
+
+            <div
+                class="configuration"
+                id="system-configuration"
+            >
+
+
+                <!-- DIMENSIÓN -->
 
                 <div class="form-group">
 
                     <label for="dimension">
+
                         Número de ecuaciones
+
                     </label>
+
 
                     <select
                         name="dimension"
                         id="dimension"
                     >
 
-                        <option value="2">
+
+                        <option
+                            value="2"
+
+                            {% if request.form.get(
+                                'dimension',
+                                '2'
+                            ) == '2' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+
                             2 ecuaciones — 2 incógnitas
+
                         </option>
+
 
                         <option
                             value="3"
-                            {% if resultado and resultado.dimension == 3 %}
+
+                            {% if request.form.get(
+                                'dimension'
+                            ) == '3' %}
+
                                 selected
+
                             {% endif %}
                         >
+
                             3 ecuaciones — 3 incógnitas
+
                         </option>
 
                     </select>
@@ -86,47 +173,206 @@
                 </div>
 
 
+
+                <!-- MÉTODO -->
+
                 <div class="form-group">
 
                     <label for="metodo">
+
                         Método de resolución
+
                     </label>
+
 
                     <select
                         name="metodo"
                         id="metodo"
                     >
 
+
                         <option
                             value="cramer"
-                            {% if resultado and resultado.metodo == "cramer" %}
+
+                            {% if request.form.get(
+                                'metodo',
+                                'cramer'
+                            ) == 'cramer' %}
+
                                 selected
+
                             {% endif %}
                         >
+
                             Regla de Cramer
+
                         </option>
 
 
                         <option
                             value="gauss"
-                            {% if resultado and resultado.metodo == "gauss" %}
+
+                            {% if request.form.get(
+                                'metodo'
+                            ) == 'gauss' %}
+
                                 selected
+
                             {% endif %}
                         >
+
                             Eliminación de Gauss
+
                         </option>
 
 
                         <option
                             value="numpy"
-                            {% if resultado and resultado.metodo == "numpy" %}
+
+                            {% if request.form.get(
+                                'metodo'
+                            ) == 'numpy' %}
+
                                 selected
+
                             {% endif %}
                         >
+
                             NumPy Solve
+
                         </option>
 
                     </select>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SARRUS
+                 ================================================= -->
+
+            <div
+                id="sarrus-container"
+                class="system-container"
+            >
+
+
+                <h3>
+                    Matriz 3×3 — Regla de Sarrus
+                </h3>
+
+
+                <p class="description">
+
+                    Introduce directamente los nueve
+                    elementos de la matriz.
+
+                </p>
+
+
+                <div class="sarrus-matrix">
+
+
+                    <!-- FILA 1 -->
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="s11"
+                        class="input-sarrus"
+                        placeholder="a11"
+                        value="{{ request.form.get('s11', '') }}"
+                    >
+
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="s12"
+                        class="input-sarrus"
+                        placeholder="a12"
+                        value="{{ request.form.get('s12', '') }}"
+                    >
+
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="s13"
+                        class="input-sarrus"
+                        placeholder="a13"
+                        value="{{ request.form.get('s13', '') }}"
+                    >
+
+
+
+                    <!-- FILA 2 -->
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="s21"
+                        class="input-sarrus"
+                        placeholder="a21"
+                        value="{{ request.form.get('s21', '') }}"
+                    >
+
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="s22"
+                        class="input-sarrus"
+                        placeholder="a22"
+                        value="{{ request.form.get('s22', '') }}"
+                    >
+
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="s23"
+                        class="input-sarrus"
+                        placeholder="a23"
+                        value="{{ request.form.get('s23', '') }}"
+                    >
+
+
+
+                    <!-- FILA 3 -->
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="s31"
+                        class="input-sarrus"
+                        placeholder="a31"
+                        value="{{ request.form.get('s31', '') }}"
+                    >
+
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="s32"
+                        class="input-sarrus"
+                        placeholder="a32"
+                        value="{{ request.form.get('s32', '') }}"
+                    >
+
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="s33"
+                        class="input-sarrus"
+                        placeholder="a33"
+                        value="{{ request.form.get('s33', '') }}"
+                    >
+
 
                 </div>
 
@@ -143,7 +389,10 @@
                 class="system-container"
             >
 
-                <h3>Sistema 2×2</h3>
+
+                <h3>
+                    Sistema 2×2
+                </h3>
 
 
                 <!-- ECUACIÓN 1 -->
@@ -151,15 +400,31 @@
                 <div class="equation">
 
 
-                    <!-- a11 -->
-
                     <select
                         name="sign_a11"
                         class="input-2x2 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a11'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -167,7 +432,7 @@
                         step="any"
                         name="a11"
                         class="input-2x2 coefficient"
-                        placeholder="2"
+                        value="{{ request.form.get('a11', '') }}"
                     >
 
                     <span class="variable">
@@ -176,15 +441,31 @@
 
 
 
-                    <!-- a12 -->
-
                     <select
                         name="sign_a12"
                         class="input-2x2 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a12'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -192,7 +473,7 @@
                         step="any"
                         name="a12"
                         class="input-2x2 coefficient"
-                        placeholder="3"
+                        value="{{ request.form.get('a12', '') }}"
                     >
 
                     <span class="variable">
@@ -201,23 +482,37 @@
 
 
 
-                    <!-- = -->
-
                     <span class="equal">
                         =
                     </span>
 
 
 
-                    <!-- b1 -->
-
                     <select
                         name="sign_b1"
                         class="input-2x2 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_b1'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -225,7 +520,7 @@
                         step="any"
                         name="b1"
                         class="input-2x2 result-input"
-                        placeholder="7"
+                        value="{{ request.form.get('b1', '') }}"
                     >
 
                 </div>
@@ -237,15 +532,31 @@
                 <div class="equation">
 
 
-                    <!-- a21 -->
-
                     <select
                         name="sign_a21"
                         class="input-2x2 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a21'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -253,7 +564,7 @@
                         step="any"
                         name="a21"
                         class="input-2x2 coefficient"
-                        placeholder="4"
+                        value="{{ request.form.get('a21', '') }}"
                     >
 
                     <span class="variable">
@@ -262,15 +573,31 @@
 
 
 
-                    <!-- a22 -->
-
                     <select
                         name="sign_a22"
                         class="input-2x2 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a22'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -278,7 +605,7 @@
                         step="any"
                         name="a22"
                         class="input-2x2 coefficient"
-                        placeholder="1"
+                        value="{{ request.form.get('a22', '') }}"
                     >
 
                     <span class="variable">
@@ -293,15 +620,31 @@
 
 
 
-                    <!-- b2 -->
-
                     <select
                         name="sign_b2"
                         class="input-2x2 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_b2'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -309,8 +652,9 @@
                         step="any"
                         name="b2"
                         class="input-2x2 result-input"
-                        placeholder="5"
+                        value="{{ request.form.get('b2', '') }}"
                     >
+
 
                 </div>
 
@@ -327,25 +671,44 @@
                 class="system-container"
             >
 
-                <h3>Sistema 3×3</h3>
+
+                <h3>
+                    Sistema 3×3
+                </h3>
 
 
-                <!-- =================================================
+                <!-- =========================
                      ECUACIÓN 1
-                     ================================================= -->
+                     ========================= -->
 
                 <div class="equation">
 
-
-                    <!-- a11 -->
 
                     <select
                         name="sign_a11"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a11'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -353,6 +716,7 @@
                         step="any"
                         name="a11"
                         class="input-3x3 coefficient"
+                        value="{{ request.form.get('a11', '') }}"
                     >
 
                     <span class="variable">
@@ -361,15 +725,31 @@
 
 
 
-                    <!-- a12 -->
-
                     <select
                         name="sign_a12"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a12'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -377,6 +757,7 @@
                         step="any"
                         name="a12"
                         class="input-3x3 coefficient"
+                        value="{{ request.form.get('a12', '') }}"
                     >
 
                     <span class="variable">
@@ -385,15 +766,31 @@
 
 
 
-                    <!-- a13 -->
-
                     <select
                         name="sign_a13"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a13'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -401,6 +798,7 @@
                         step="any"
                         name="a13"
                         class="input-3x3 coefficient"
+                        value="{{ request.form.get('a13', '') }}"
                     >
 
                     <span class="variable">
@@ -415,15 +813,31 @@
 
 
 
-                    <!-- b1 -->
-
                     <select
                         name="sign_b1"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_b1'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -431,28 +845,46 @@
                         step="any"
                         name="b1"
                         class="input-3x3 result-input"
+                        value="{{ request.form.get('b1', '') }}"
                     >
+
 
                 </div>
 
 
 
-                <!-- =================================================
+                <!-- =========================
                      ECUACIÓN 2
-                     ================================================= -->
+                     ========================= -->
 
                 <div class="equation">
 
-
-                    <!-- a21 -->
 
                     <select
                         name="sign_a21"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a21'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -460,6 +892,7 @@
                         step="any"
                         name="a21"
                         class="input-3x3 coefficient"
+                        value="{{ request.form.get('a21', '') }}"
                     >
 
                     <span class="variable">
@@ -468,15 +901,31 @@
 
 
 
-                    <!-- a22 -->
-
                     <select
                         name="sign_a22"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a22'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -484,6 +933,7 @@
                         step="any"
                         name="a22"
                         class="input-3x3 coefficient"
+                        value="{{ request.form.get('a22', '') }}"
                     >
 
                     <span class="variable">
@@ -492,15 +942,31 @@
 
 
 
-                    <!-- a23 -->
-
                     <select
                         name="sign_a23"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a23'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -508,6 +974,7 @@
                         step="any"
                         name="a23"
                         class="input-3x3 coefficient"
+                        value="{{ request.form.get('a23', '') }}"
                     >
 
                     <span class="variable">
@@ -522,15 +989,31 @@
 
 
 
-                    <!-- b2 -->
-
                     <select
                         name="sign_b2"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_b2'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -538,28 +1021,46 @@
                         step="any"
                         name="b2"
                         class="input-3x3 result-input"
+                        value="{{ request.form.get('b2', '') }}"
                     >
+
 
                 </div>
 
 
 
-                <!-- =================================================
+                <!-- =========================
                      ECUACIÓN 3
-                     ================================================= -->
+                     ========================= -->
 
                 <div class="equation">
 
-
-                    <!-- a31 -->
 
                     <select
                         name="sign_a31"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a31'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -567,6 +1068,7 @@
                         step="any"
                         name="a31"
                         class="input-3x3 coefficient"
+                        value="{{ request.form.get('a31', '') }}"
                     >
 
                     <span class="variable">
@@ -575,15 +1077,31 @@
 
 
 
-                    <!-- a32 -->
-
                     <select
                         name="sign_a32"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a32'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -591,6 +1109,7 @@
                         step="any"
                         name="a32"
                         class="input-3x3 coefficient"
+                        value="{{ request.form.get('a32', '') }}"
                     >
 
                     <span class="variable">
@@ -599,15 +1118,31 @@
 
 
 
-                    <!-- a33 -->
-
                     <select
                         name="sign_a33"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_a33'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -615,6 +1150,7 @@
                         step="any"
                         name="a33"
                         class="input-3x3 coefficient"
+                        value="{{ request.form.get('a33', '') }}"
                     >
 
                     <span class="variable">
@@ -629,15 +1165,31 @@
 
 
 
-                    <!-- b3 -->
-
                     <select
                         name="sign_b3"
                         class="input-3x3 sign-selector"
                     >
-                        <option value="1">+</option>
-                        <option value="-1">−</option>
+
+                        <option value="1">
+                            +
+                        </option>
+
+                        <option
+                            value="-1"
+
+                            {% if request.form.get(
+                                'sign_b3'
+                            ) == '-1' %}
+
+                                selected
+
+                            {% endif %}
+                        >
+                            −
+                        </option>
+
                     </select>
+
 
                     <input
                         type="number"
@@ -645,7 +1197,9 @@
                         step="any"
                         name="b3"
                         class="input-3x3 result-input"
+                        value="{{ request.form.get('b3', '') }}"
                     >
+
 
                 </div>
 
@@ -660,8 +1214,11 @@
             <button
                 type="submit"
                 class="solve-button"
+                id="solve-button"
             >
+
                 Resolver sistema
+
             </button>
 
 
@@ -677,9 +1234,12 @@
 
     {% if error %}
 
+
         <section class="card error-card">
 
-            <h2>Error</h2>
+            <h2>
+                Error
+            </h2>
 
             <p>
                 {{ error }}
@@ -687,195 +1247,401 @@
 
         </section>
 
+
     {% endif %}
 
 
 
     <!-- =====================================================
-         RESULTADO
+         RESULTADO SARRUS
          ===================================================== -->
 
-    {% if resultado %}
+    {% if resultado_sarrus %}
+
 
         <section class="card">
 
-            <h2>Resultado</h2>
+
+            <h2>
+                Resultado — Regla de Sarrus
+            </h2>
 
 
-            {% if resultado.estado == "unica" %}
-
-                <div class="status success">
-
-                    Sistema compatible determinado:
-                    existe una única solución.
-
-                </div>
-
-
-                <div class="solution">
-
-                    <h3>Solución</h3>
-
-
-                    <div class="solution-values">
-
-                        <div>
-                            <strong>x =</strong>
-                            {{ "%.4f"|format(resultado.solucion[0]) }}
-                        </div>
-
-
-                        <div>
-                            <strong>y =</strong>
-                            {{ "%.4f"|format(resultado.solucion[1]) }}
-                        </div>
-
-
-                        {% if resultado.dimension == 3 %}
-
-                            <div>
-                                <strong>z =</strong>
-                                {{ "%.4f"|format(resultado.solucion[2]) }}
-                            </div>
-
-                        {% endif %}
-
-                    </div>
-
-                </div>
-
-
-            {% elif resultado.estado == "infinitas" %}
-
-                <div class="status warning">
-
-                    El sistema tiene infinitas soluciones.
-
-                </div>
-
-
-            {% else %}
-
-                <div class="status error">
-
-                    El sistema no tiene solución.
-
-                </div>
-
-            {% endif %}
-
+            <p>
+                Matriz de orden 3:
+            </p>
 
 
             <!-- =================================================
-                 INFORMACIÓN MATEMÁTICA
-                 ================================================= -->
+                MATRIZ AMPLIADA PARA SARRUS
+                ================================================= -->
 
-            <div class="math-info">
+            <div class="sarrus-extended-matrix">
 
+                {% for fila in resultado_sarrus.matriz %}
 
-                <div>
+                    <div class="sarrus-extended-row">
 
-                    <strong>
-                        Determinante
-                    </strong>
+                        <!-- =====================================
+                            MATRIZ ORIGINAL 3x3
+                            ===================================== -->
 
-                    <br>
+                        {% for valor in fila %}
 
-                    {{ "%.4f"|format(resultado.determinante) }}
+                            <span class="sarrus-cell original-cell">
 
-                </div>
+                                {{ "%.2f"|format(valor) }}
 
+                            </span>
 
-                <div>
+                        {% endfor %}
 
-                    <strong>
-                        Rango de A
-                    </strong>
-
-                    <br>
-
-                    {{ resultado.rango_A }}
-
-                </div>
+                        
 
 
-                <div>
+                        <!-- =====================================
+                            SEPARADOR VISUAL
+                            ===================================== -->
 
-                    <strong>
-                        Rango de [A | b]
-                    </strong>
-
-                    <br>
-
-                    {{ resultado.rango_aumentada }}
-
-                </div>
+                        <span class="sarrus-separator"></span>
 
 
-                <div>
+                        <!-- =====================================
+                            REPETIMOS COLUMNA 1
+                            ===================================== -->
 
-                    <strong>
-                        Método
-                    </strong>
+                        <span class="sarrus-cell repeated-cell">
 
-                    <br>
+                            {{ "%.2f"|format(fila[0]) }}
 
-                    {% if resultado.metodo == "cramer" %}
+                        </span>
 
-                        Regla de Cramer
 
-                    {% elif resultado.metodo == "gauss" %}
+                        <!-- =====================================
+                            REPETIMOS COLUMNA 2
+                            ===================================== -->
 
-                        Eliminación de Gauss
+                        <span class="sarrus-cell repeated-cell">
 
-                    {% else %}
+                            {{ "%.2f"|format(fila[1]) }}
 
-                        NumPy Solve
+                        </span>
 
-                    {% endif %}
+                    </div>
 
-                </div>
+                {% endfor %}
 
+                <svg
+                    id="sarrus-lines"
+                    class="sarrus-lines"
+                    aria-hidden="true"
+                ></svg>
 
             </div>
 
 
 
-            <!-- =================================================
-                 MATRIZ A
-                 ================================================= -->
-
-            <div class="result-block">
-
-                <h3>Matriz de coeficientes A</h3>
+            <div class="solution">
 
 
-                <div class="result-matrix">
+                <h3>
+                    Determinante
+                </h3>
 
-                    {% for fila in resultado.matriz_A %}
 
-                        <div class="result-row">
+                <div class="solution-values">
 
-                            {% for valor in fila %}
 
-                                <span>
-                                    {{ "%.2f"|format(valor) }}
-                                </span>
+                    <div>
 
-                            {% endfor %}
+                        <strong>
+                            D =
+                        </strong>
 
-                        </div>
+                        {{
+                            "%.4f"
+                            |format(
+                                resultado_sarrus.determinante
+                            )
+                        }}
 
-                    {% endfor %}
+                    </div>
+
 
                 </div>
+
 
             </div>
 
 
         </section>
 
+
     {% endif %}
+
+
+
+    <!-- =====================================================
+     RESULTADO DE SARRUS
+     ===================================================== -->
+
+{% if resultado_sarrus %}
+
+<section class="card sarrus-result">
+
+    <h2>
+        Resultado — Regla de Sarrus
+    </h2>
+
+
+    <!-- =================================================
+         MATRIZ ORIGINAL
+         ================================================= -->
+
+    <div class="sarrus-result-section">
+
+        <h3>
+            Matriz de orden 3
+        </h3>
+
+
+        <div class="result-matrix">
+
+            {% for fila in resultado_sarrus.matriz %}
+
+                <div class="result-row">
+
+                    {% for valor in fila %}
+
+                        <span>
+                            {{ "%.2f"|format(valor) }}
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         DIAGONALES POSITIVAS
+         ================================================= -->
+
+    <div class="sarrus-process-section">
+
+        <h3>
+            Diagonales positivas
+        </h3>
+
+        <p class="sarrus-description">
+            Multiplicamos las tres diagonales descendentes.
+        </p>
+
+
+        <div class="sarrus-operations">
+
+            {% for diagonal in
+                resultado_sarrus.procedimiento.positivas
+            %}
+
+                <div class="sarrus-operation">
+
+                    <span class="operation-expression">
+
+                        ({{ "%.2f"|format(diagonal.factores[0]) }})
+
+                        ×
+
+                        ({{ "%.2f"|format(diagonal.factores[1]) }})
+
+                        ×
+
+                        ({{ "%.2f"|format(diagonal.factores[2]) }})
+
+                    </span>
+
+
+                    <span class="operation-equal">
+                        =
+                    </span>
+
+
+                    <strong>
+
+                        {{ "%.2f"|format(diagonal.resultado) }}
+
+                    </strong>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="sarrus-subtotal">
+
+            Suma de diagonales positivas:
+
+            <strong>
+
+                {{
+                    "%.2f"|format(
+                        resultado_sarrus
+                        .procedimiento
+                        .suma_positivas
+                    )
+                }}
+
+            </strong>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         DIAGONALES NEGATIVAS
+         ================================================= -->
+
+    <div class="sarrus-process-section">
+
+        <h3>
+            Diagonales negativas
+        </h3>
+
+        <p class="sarrus-description">
+            Multiplicamos las tres diagonales ascendentes.
+        </p>
+
+
+        <div class="sarrus-operations">
+
+            {% for diagonal in
+                resultado_sarrus.procedimiento.negativas
+            %}
+
+                <div class="sarrus-operation">
+
+                    <span class="operation-expression">
+
+                        ({{ "%.2f"|format(diagonal.factores[0]) }})
+
+                        ×
+
+                        ({{ "%.2f"|format(diagonal.factores[1]) }})
+
+                        ×
+
+                        ({{ "%.2f"|format(diagonal.factores[2]) }})
+
+                    </span>
+
+
+                    <span class="operation-equal">
+                        =
+                    </span>
+
+
+                    <strong>
+
+                        {{ "%.2f"|format(diagonal.resultado) }}
+
+                    </strong>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="sarrus-subtotal">
+
+            Suma de diagonales negativas:
+
+            <strong>
+
+                {{
+                    "%.2f"|format(
+                        resultado_sarrus
+                        .procedimiento
+                        .suma_negativas
+                    )
+                }}
+
+            </strong>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         DETERMINANTE FINAL
+         ================================================= -->
+
+    <div class="sarrus-final-result">
+
+        <h3>
+            Cálculo final
+        </h3>
+
+
+        <div class="final-operation">
+
+            D =
+
+            {{
+                "%.2f"|format(
+                    resultado_sarrus
+                    .procedimiento
+                    .suma_positivas
+                )
+            }}
+
+            −
+
+            {{
+                "%.2f"|format(
+                    resultado_sarrus
+                    .procedimiento
+                    .suma_negativas
+                )
+            }}
+
+        </div>
+
+
+        <div class="final-determinant">
+
+            D =
+
+            <strong>
+
+                {{
+                    "%.4f"|format(
+                        resultado_sarrus.determinante
+                    )
+                }}
+
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endif %}
 
 
 
@@ -885,7 +1651,9 @@
 
     {% if grafica %}
 
+
         <section class="card graph-card">
+
 
             <h2>
                 Representación gráfica
@@ -898,7 +1666,9 @@
                 class="graph-image"
             >
 
+
         </section>
+
 
     {% endif %}
 
@@ -908,89 +1678,474 @@
 
 
 <!-- =========================================================
-     JAVASCRIPT DE INTERFAZ
+     JAVASCRIPT
      ========================================================= -->
 
 <script>
 
+
+    // =====================================================
+    // ELEMENTOS
+    // =====================================================
+
+    const operacion =
+        document.getElementById(
+            "operacion"
+        );
+
+
     const dimension =
-        document.getElementById("dimension");
+        document.getElementById(
+            "dimension"
+        );
+
+
+    const metodo =
+        document.getElementById(
+            "metodo"
+        );
+
+
+    const configuracionSistema =
+        document.getElementById(
+            "system-configuration"
+        );
 
 
     const sistema2 =
-        document.getElementById("sistema-2x2");
+        document.getElementById(
+            "sistema-2x2"
+        );
 
 
     const sistema3 =
-        document.getElementById("sistema-3x3");
+        document.getElementById(
+            "sistema-3x3"
+        );
 
+
+    const sarrus =
+        document.getElementById(
+            "sarrus-container"
+        );
+
+
+    const boton =
+        document.getElementById(
+            "solve-button"
+        );
+
+
+
+    // =====================================================
+    // INPUTS
+    // =====================================================
 
     const inputs2 =
-        document.querySelectorAll(".input-2x2");
+        document.querySelectorAll(
+            ".input-2x2"
+        );
 
 
     const inputs3 =
-        document.querySelectorAll(".input-3x3");
+        document.querySelectorAll(
+            ".input-3x3"
+        );
 
 
+    const inputsSarrus =
+        document.querySelectorAll(
+            ".input-sarrus"
+        );
+
+
+
+    // =====================================================
+    // ACTIVAR / DESACTIVAR
+    // =====================================================
+
+    function configurarInputs(
+        inputs,
+        activo
+    ) {
+
+        inputs.forEach(
+            input => {
+
+                input.disabled =
+                    !activo;
+
+                input.required =
+                    activo;
+
+            }
+        );
+
+    }
+
+
+
+    // =====================================================
+    // 2x2 / 3x3
+    // =====================================================
 
     function actualizarSistema() {
 
 
-        if (dimension.value === "2") {
+        if (
+            dimension.value === "2"
+        ) {
+
+            sistema2.style.display =
+                "block";
+
+            sistema3.style.display =
+                "none";
 
 
-            sistema2.style.display = "block";
+            configurarInputs(
+                inputs2,
+                true
+            );
 
-            sistema3.style.display = "none";
+            configurarInputs(
+                inputs3,
+                false
+            );
 
-
-            inputs2.forEach(input => {
-
-                input.disabled = false;
-
-                input.required = true;
-
-            });
-
-
-            inputs3.forEach(input => {
-
-                input.disabled = true;
-
-                input.required = false;
-
-            });
+        }
 
 
-        } else {
+        else {
+
+            sistema2.style.display =
+                "none";
+
+            sistema3.style.display =
+                "block";
 
 
-            sistema2.style.display = "none";
+            configurarInputs(
+                inputs2,
+                false
+            );
 
-            sistema3.style.display = "block";
-
-
-            inputs2.forEach(input => {
-
-                input.disabled = true;
-
-                input.required = false;
-
-            });
-
-
-            inputs3.forEach(input => {
-
-                input.disabled = false;
-
-                input.required = true;
-
-            });
+            configurarInputs(
+                inputs3,
+                true
+            );
 
         }
 
     }
+
+    // =====================================================
+    // DIBUJAR DIAGONALES DE SARRUS
+    // =====================================================
+
+    function dibujarDiagonalesSarrus() {
+
+        const contenedor =
+            document.querySelector(
+                ".sarrus-extended-matrix"
+            );
+
+        const svg =
+            document.getElementById(
+                "sarrus-lines"
+            );
+
+        // Si todavía no existe un resultado de Sarrus,
+        // simplemente no hacemos nada.
+        if (!contenedor || !svg) {
+            return;
+        }
+
+
+        const filas =
+            contenedor.querySelectorAll(
+                ".sarrus-extended-row"
+            );
+
+
+        if (filas.length !== 3) {
+            return;
+        }
+
+
+        /*
+            Cada fila contiene 5 celdas numéricas:
+
+            columna 0
+            columna 1
+            columna 2
+            columna 3 repetida
+            columna 4 repetida
+
+            El separador no tiene clase .sarrus-cell,
+            por eso no afecta este arreglo.
+        */
+
+        const celdas = Array.from(
+            filas
+        ).map(
+            fila =>
+                Array.from(
+                    fila.querySelectorAll(
+                        ".sarrus-cell"
+                    )
+                )
+        );
+
+
+        const rectContenedor =
+            contenedor.getBoundingClientRect();
+
+
+        // Adaptamos el SVG al tamaño real
+        // de la matriz en pantalla.
+        svg.setAttribute(
+            "viewBox",
+            `0 0 ${rectContenedor.width} ${rectContenedor.height}`
+        );
+
+
+        // Borramos líneas anteriores.
+        svg.innerHTML = "";
+
+
+        // =================================================
+        // OBTENER EL CENTRO DE UNA CELDA
+        // =================================================
+
+        function centro(fila, columna) {
+
+            const rect =
+                celdas[fila][columna]
+                    .getBoundingClientRect();
+
+            return {
+
+                x:
+                    rect.left
+                    - rectContenedor.left
+                    + rect.width / 2,
+
+                y:
+                    rect.top
+                    - rectContenedor.top
+                    + rect.height / 2
+            };
+        }
+
+
+        // =================================================
+        // CREAR UNA LÍNEA DE TRES PUNTOS
+        // =================================================
+
+        function crearDiagonal(
+            puntos,
+            clase
+        ) {
+
+            const polyline =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "polyline"
+                );
+
+
+            const coordenadas =
+                puntos
+                    .map(
+                        punto =>
+                            `${punto.x},${punto.y}`
+                    )
+                    .join(" ");
+
+
+            polyline.setAttribute(
+                "points",
+                coordenadas
+            );
+
+            polyline.setAttribute(
+                "class",
+                clase
+            );
+
+            svg.appendChild(
+                polyline
+            );
+        }
+
+
+        // =================================================
+        // DIAGONALES POSITIVAS
+        //
+        // ↘ ↘ ↘
+        // =================================================
+
+        crearDiagonal(
+            [
+                centro(0, 0),
+                centro(1, 1),
+                centro(2, 2)
+            ],
+            "sarrus-line positive-line"
+        );
+
+
+        crearDiagonal(
+            [
+                centro(0, 1),
+                centro(1, 2),
+                centro(2, 3)
+            ],
+            "sarrus-line positive-line"
+        );
+
+
+        crearDiagonal(
+            [
+                centro(0, 2),
+                centro(1, 3),
+                centro(2, 4)
+            ],
+            "sarrus-line positive-line"
+        );
+
+
+        // =================================================
+        // DIAGONALES NEGATIVAS
+        //
+        // ↗ ↗ ↗
+        // =================================================
+
+        crearDiagonal(
+            [
+                centro(2, 0),
+                centro(1, 1),
+                centro(0, 2)
+            ],
+            "sarrus-line negative-line"
+        );
+
+
+        crearDiagonal(
+            [
+                centro(2, 1),
+                centro(1, 2),
+                centro(0, 3)
+            ],
+            "sarrus-line negative-line"
+        );
+
+
+        crearDiagonal(
+            [
+                centro(2, 2),
+                centro(1, 3),
+                centro(0, 4)
+            ],
+            "sarrus-line negative-line"
+        );
+    }
+
+    // =====================================================
+    // SISTEMA / SARRUS
+    // =====================================================
+
+    function actualizarOperacion() {
+
+
+        // -----------------------------------------------
+        // SISTEMA
+        // -----------------------------------------------
+
+        if (
+            operacion.value
+            === "sistema"
+        ) {
+
+            configuracionSistema.style.display =
+                "flex";
+
+
+            sarrus.style.display =
+                "none";
+
+
+            configurarInputs(
+                inputsSarrus,
+                false
+            );
+
+
+            actualizarSistema();
+
+
+            boton.textContent =
+                "Resolver sistema";
+
+        }
+
+
+        // -----------------------------------------------
+        // SARRUS
+        // -----------------------------------------------
+
+        else {
+
+            configuracionSistema.style.display =
+                "none";
+
+
+            sistema2.style.display =
+                "none";
+
+            sistema3.style.display =
+                "none";
+
+
+            configurarInputs(
+                inputs2,
+                false
+            );
+
+            configurarInputs(
+                inputs3,
+                false
+            );
+
+
+            sarrus.style.display =
+                "block";
+
+
+            configurarInputs(
+                inputsSarrus,
+                true
+            );
+
+
+            boton.textContent =
+                "Calcular determinante";
+
+        }
+
+    }
+
+
+
+    // =====================================================
+    // EVENTOS
+    // =====================================================
+
+    operacion.addEventListener(
+        "change",
+        actualizarOperacion
+    );
 
 
     dimension.addEventListener(
@@ -999,7 +2154,19 @@
     );
 
 
-    actualizarSistema();
+
+    // =====================================================
+    // INICIALIZAR
+    // =====================================================
+
+    actualizarOperacion();
+
+    dibujarDiagonalesSarrus();
+
+    window.addEventListener(
+    "resize",
+    dibujarDiagonalesSarrus
+    );
 
 </script>
 

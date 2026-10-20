@@ -825,3 +825,978 @@ body {
         padding: 10px;
     }
 }
+
+/* ============================================================
+   REGLA DE SARRUS
+   ============================================================ */
+
+#sarrus-container {
+    margin-top: 30px;
+    padding: 30px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+
+#sarrus-container h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+
+    text-align: center;
+}
+
+
+#sarrus-container .description {
+    text-align: center;
+
+    margin-bottom: 30px;
+
+    color: #64748b;
+}
+
+
+/* ============================================================
+   MATRIZ DE ENTRADA DE SARRUS
+   ============================================================ */
+
+.sarrus-matrix {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 90px);
+
+    gap: 14px;
+
+    width: max-content;
+
+    margin: 25px auto;
+
+    padding: 22px 28px;
+
+    position: relative;
+}
+
+
+/* ============================================================
+   CORCHETE IZQUIERDO
+   ============================================================ */
+
+.sarrus-matrix::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 12px;
+
+    border-left: 3px solid #111827;
+    border-top: 3px solid #111827;
+    border-bottom: 3px solid #111827;
+
+    border-radius:
+        4px 0 0 4px;
+}
+
+
+/* ============================================================
+   CORCHETE DERECHO
+   ============================================================ */
+
+.sarrus-matrix::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+    right: 0;
+
+    width: 12px;
+
+    border-right: 3px solid #111827;
+    border-top: 3px solid #111827;
+    border-bottom: 3px solid #111827;
+
+    border-radius:
+        0 4px 4px 0;
+}
+
+
+/* ============================================================
+   INPUTS DE LA MATRIZ
+   ============================================================ */
+
+.input-sarrus {
+    width: 90px;
+    height: 48px;
+
+    padding: 8px;
+
+    text-align: center;
+
+    font-size: 18px;
+
+    font-weight: 500;
+
+    background: white;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.input-sarrus:focus {
+    outline: none;
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.15);
+}
+
+
+/* ============================================================
+   RESULTADO DE SARRUS
+   ============================================================ */
+
+#sarrus-container + .solution {
+    margin-top: 25px;
+}
+
+
+/* ============================================================
+   MATRICES DE RESULTADO
+   ============================================================ */
+
+.result-matrix {
+    display: inline-block;
+
+    position: relative;
+
+    padding: 18px 25px;
+
+    margin: 10px 0 20px;
+
+    background: #f8fafc;
+
+    border-radius: 8px;
+}
+
+
+/* Corchete izquierdo */
+
+.result-matrix::before {
+    content: "";
+
+    position: absolute;
+
+    top: 4px;
+    bottom: 4px;
+    left: 5px;
+
+    width: 9px;
+
+    border-left: 2px solid #111827;
+    border-top: 2px solid #111827;
+    border-bottom: 2px solid #111827;
+}
+
+
+/* Corchete derecho */
+
+.result-matrix::after {
+    content: "";
+
+    position: absolute;
+
+    top: 4px;
+    bottom: 4px;
+    right: 5px;
+
+    width: 9px;
+
+    border-right: 2px solid #111827;
+    border-top: 2px solid #111827;
+    border-bottom: 2px solid #111827;
+}
+
+
+.result-row {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 24px;
+
+    margin: 8px 0;
+}
+
+
+.result-row span {
+    min-width: 60px;
+
+    text-align: center;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 17px;
+}
+
+
+/* ============================================================
+   PROCEDIMIENTO DE CRAMER
+   ============================================================ */
+
+.cramer-section {
+    margin-top: 35px;
+    padding-top: 25px;
+
+    border-top:
+        1px solid #e5e7eb;
+}
+
+
+.cramer-section > h3 {
+    margin-bottom: 15px;
+}
+
+
+/* ============================================================
+   TARJETAS DE DETERMINANTES
+   ============================================================ */
+
+.determinant-card {
+    margin-top: 20px;
+
+    padding: 20px;
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 10px;
+}
+
+
+.determinant-card h4 {
+    margin-top: 0;
+
+    font-size: 18px;
+
+    color: #111827;
+}
+
+
+/* ============================================================
+   Dx, Dy, Dz
+   ============================================================ */
+
+.variable-determinants {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(260px, 1fr)
+        );
+
+    gap: 20px;
+
+    margin-top: 25px;
+}
+
+
+/* ============================================================
+   VALOR DEL DETERMINANTE
+   ============================================================ */
+
+.determinant-value {
+    margin-top: 15px;
+
+    font-size: 18px;
+}
+
+
+.determinant-value strong {
+    font-size: 20px;
+
+    color: #2563eb;
+}
+
+
+/* ============================================================
+   FÓRMULA DE CRAMER
+   ============================================================ */
+
+.cramer-formula {
+    margin-top: 15px;
+
+    padding: 12px;
+
+    background: white;
+
+    border-radius: 7px;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 16px;
+
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   TEXTO EXPLICATIVO
+   ============================================================ */
+
+.explanation {
+    padding: 14px 16px;
+
+    background: #eff6ff;
+
+    border-left:
+        4px solid #2563eb;
+
+    border-radius: 6px;
+
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   RESPONSIVE - TABLETS
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    .sarrus-matrix {
+        grid-template-columns:
+            repeat(3, 72px);
+
+        gap: 10px;
+
+        padding:
+            18px 24px;
+    }
+
+
+    .input-sarrus {
+        width: 72px;
+
+        height: 45px;
+
+        font-size: 16px;
+    }
+
+
+    .variable-determinants {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE - CELULARES
+   ============================================================ */
+
+@media (max-width: 480px) {
+
+    #sarrus-container {
+        padding:
+            20px 10px;
+    }
+
+
+    .sarrus-matrix {
+        grid-template-columns:
+            repeat(3, 60px);
+
+        gap: 8px;
+
+        padding:
+            16px 20px;
+    }
+
+
+    .input-sarrus {
+        width: 60px;
+
+        padding: 6px;
+
+        font-size: 15px;
+    }
+
+
+    .result-row {
+        gap: 8px;
+    }
+
+
+    .result-row span {
+        min-width: 45px;
+
+        font-size: 14px;
+    }
+
+}
+
+/* ============================================================
+   RESULTADO - REGLA DE SARRUS
+   ============================================================ */
+
+.sarrus-result {
+    margin-top: 30px;
+}
+
+
+/* ============================================================
+   SECCIONES INTERNAS
+   ============================================================ */
+
+.sarrus-result-section,
+.sarrus-process-section,
+.sarrus-final-result {
+    margin-top: 25px;
+    padding: 22px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+
+.sarrus-result-section h3,
+.sarrus-process-section h3,
+.sarrus-final-result h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+
+/* ============================================================
+   TEXTO EXPLICATIVO
+   ============================================================ */
+
+.sarrus-description {
+    margin-top: 5px;
+    margin-bottom: 20px;
+
+    color: #64748b;
+
+    font-size: 15px;
+}
+
+
+/* ============================================================
+   CONTENEDOR DE OPERACIONES
+   ============================================================ */
+
+.sarrus-operations {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(230px, 1fr)
+        );
+
+    gap: 15px;
+
+    margin-top: 20px;
+}
+
+
+/* ============================================================
+   CADA MULTIPLICACIÓN
+   ============================================================ */
+
+.sarrus-operation {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 15px;
+
+    background: white;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 16px;
+}
+
+
+/* Expresión matemática */
+
+.operation-expression {
+    white-space: nowrap;
+}
+
+
+/* Signo igual */
+
+.operation-equal {
+    font-weight: bold;
+
+    color: #64748b;
+}
+
+
+/* Resultado individual */
+
+.sarrus-operation strong {
+    font-size: 18px;
+
+    color: #2563eb;
+}
+
+
+/* ============================================================
+   SUBTOTAL
+   ============================================================ */
+
+.sarrus-subtotal {
+    margin-top: 20px;
+
+    padding: 15px 18px;
+
+    background: #eef2ff;
+
+    border-left: 4px solid #2563eb;
+    border-radius: 7px;
+
+    font-size: 17px;
+}
+
+
+.sarrus-subtotal strong {
+    margin-left: 6px;
+
+    font-size: 19px;
+}
+
+
+/* ============================================================
+   RESULTADO FINAL
+   ============================================================ */
+
+.sarrus-final-result {
+    text-align: center;
+
+    background: #eff6ff;
+
+    border: 1px solid #bfdbfe;
+}
+
+
+/* Primera operación:
+
+   D = suma positiva - suma negativa
+*/
+
+.final-operation {
+    margin-top: 15px;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 20px;
+
+    font-weight: 500;
+}
+
+
+/* D = resultado */
+
+.final-determinant {
+    margin-top: 18px;
+
+    padding: 18px;
+
+    background: white;
+
+    border-radius: 8px;
+
+    font-size: 24px;
+}
+
+
+.final-determinant strong {
+    color: #2563eb;
+
+    font-size: 28px;
+}
+
+
+/* ============================================================
+   DIFERENCIAR POSITIVAS Y NEGATIVAS VISUALMENTE
+   ============================================================ */
+
+/*
+   nth-of-type(2)
+
+   Dentro del resultado de Sarrus:
+
+   1 → matriz original
+   2 → diagonales positivas
+   3 → diagonales negativas
+
+   Esto añade una pequeña diferencia visual.
+*/
+
+.sarrus-process-section:nth-of-type(2) {
+    border-left: 4px solid #16a34a;
+}
+
+
+.sarrus-process-section:nth-of-type(3) {
+    border-left: 4px solid #dc2626;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    .sarrus-operations {
+        grid-template-columns: 1fr;
+    }
+
+
+    .sarrus-operation {
+        justify-content: flex-start;
+
+        overflow-x: auto;
+    }
+
+
+    .final-operation {
+        font-size: 18px;
+    }
+
+
+    .final-determinant {
+        font-size: 21px;
+    }
+
+
+    .final-determinant strong {
+        font-size: 24px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .sarrus-result-section,
+    .sarrus-process-section,
+    .sarrus-final-result {
+        padding: 16px;
+    }
+
+
+    .sarrus-operation {
+        font-size: 14px;
+    }
+
+
+    .sarrus-subtotal {
+        font-size: 15px;
+    }
+}
+
+/* ============================================================
+   MATRIZ AMPLIADA - REGLA DE SARRUS
+   ============================================================ */
+
+.sarrus-extended-matrix {
+    width: max-content;
+
+    margin: 25px auto;
+
+    padding: 20px 22px;
+
+    position: relative;
+
+    background: #ffffff;
+
+    border-radius: 10px;
+}
+
+
+/* ============================================================
+   CADA FILA
+   ============================================================ */
+
+.sarrus-extended-row {
+    display: grid;
+
+    /*
+        3 columnas originales
+        + separador
+        + 2 columnas repetidas
+    */
+
+    grid-template-columns:
+        70px
+        70px
+        70px
+        18px
+        70px
+        70px;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin: 12px 0;
+}
+
+
+/* ============================================================
+   CELDAS
+   ============================================================ */
+
+.sarrus-cell {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 8px;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+    border-radius: 6px;
+}
+
+
+/* ============================================================
+   MATRIZ ORIGINAL
+   ============================================================ */
+
+.original-cell {
+    color: #111827;
+
+    background: #f8fafc;
+}
+
+
+/* ============================================================
+   COLUMNAS REPETIDAS
+   ============================================================ */
+
+.repeated-cell {
+    color: #475569;
+
+    background: #eef2ff;
+
+    border: 1px dashed #94a3b8;
+}
+
+
+/* ============================================================
+   SEPARADOR ENTRE MATRIZ Y COLUMNAS REPETIDAS
+   ============================================================ */
+
+.sarrus-separator {
+    display: block;
+
+    width: 1px;
+    height: 100%;
+
+    min-height: 42px;
+
+    margin: auto;
+
+    background: #94a3b8;
+}
+
+
+/* ============================================================
+   CORCHETE IZQUIERDO DE LA MATRIZ ORIGINAL
+   ============================================================ */
+
+.sarrus-extended-matrix::before {
+    content: "";
+
+    position: absolute;
+
+    /*
+        El corchete solamente debe cubrir
+        las primeras tres columnas.
+    */
+
+    top: 12px;
+    bottom: 12px;
+    left: 8px;
+
+    width: 10px;
+
+    border-left: 3px solid #111827;
+    border-top: 3px solid #111827;
+    border-bottom: 3px solid #111827;
+
+    border-radius:
+        4px 0 0 4px;
+}
+
+
+/* ============================================================
+   LÍNEA QUE INDICA DÓNDE TERMINA LA MATRIZ ORIGINAL
+   ============================================================ */
+
+.sarrus-extended-row
+.original-cell:nth-child(3) {
+    margin-right: 4px;
+}
+
+
+/* ============================================================
+   ETIQUETA VISUAL PARA COLUMNAS AUXILIARES
+   ============================================================ */
+
+.repeated-cell {
+    position: relative;
+}
+
+
+/*
+    Las columnas repetidas son auxiliares.
+    No forman parte de la matriz original.
+*/
+
+.sarrus-result-section::after {
+    content:
+        "Las dos últimas columnas son una repetición de las dos primeras para aplicar Sarrus.";
+
+    display: block;
+
+    max-width: 600px;
+
+    margin:
+        10px auto 0;
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    font-style: italic;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    .sarrus-extended-matrix {
+        overflow-x: auto;
+
+        max-width: 100%;
+    }
+
+
+    .sarrus-extended-row {
+        grid-template-columns:
+            60px
+            60px
+            60px
+            14px
+            60px
+            60px;
+
+        gap: 7px;
+    }
+
+
+    .sarrus-cell {
+        font-size: 16px;
+
+        min-height: 40px;
+    }
+}
+
+/* ============================================================
+   DIAGONALES VISUALES DE SARRUS
+   ============================================================ */
+
+.sarrus-lines {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+
+    z-index: 10;
+
+    overflow: visible;
+}
+
+
+.sarrus-line {
+    fill: none;
+
+    stroke-width: 3;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    opacity: 0.55;
+}
+
+
+/* Diagonales que se SUMAN */
+
+.positive-line {
+    stroke: #16a34a;
+}
+
+
+/* Diagonales que se RESTAN */
+
+.negative-line {
+    stroke: #dc2626;
+}
