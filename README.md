@@ -1,6 +1,6 @@
 # Álgebra Visual
 
-Aplicación web académica para resolver sistemas lineales, desarrollar determinantes y operar con vectores. Cada módulo muestra los cálculos y su interpretación geométrica. El objetivo es que el estudiante pueda comprobar un resultado y explicar cómo se obtuvo durante la sustentación.
+Aplicación web académica para resolver sistemas lineales, desarrollar determinantes y operar con vectores. Cada módulo muestra los cálculos y su interpretación geométrica. El objetivo es que yo como estudiante pueda comprobar un resultado y explicar cómo se obtuvo.
 
 ## Instalación en Linux y Windows
 
@@ -129,5 +129,3 @@ Los enunciados originales del taller no aparecieron en el repositorio, su histor
 - Trabaja con sistemas cuadrados 2×2 y 3×3 y vectores de 2 o 3 componentes. Acepta coma o punto decimal y notación científica. Admite cero y valores con magnitud de 10⁻²⁰ a 10²⁰, con hasta 16 dígitos significativos y hasta 64 caracteres por campo.
 - Las gráficas, las normas irracionales y el contraste con NumPy se aproximan en punto flotante. Al combinar magnitudes muy distintas, la resolución visual puede ocultar detalles que sí se distinguen en el cálculo exacto.
 - Las figuras requieren JavaScript, y las 3D requieren WebGL. Los formularios y el procedimiento textual siguen disponibles si se desactiva JavaScript. Las figuras de rectas y planos muestran una región finita del conjunto geométrico.
-
-La guía para preparar la defensa está en [SUSTENTACION.md](SUSTENTACION.md). La licencia de distribución del proyecto está pendiente de definir.
