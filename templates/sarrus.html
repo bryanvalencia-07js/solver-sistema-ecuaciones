@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "componentes.html" import campo, controles, matriz, det with context %}
+{% block contenido %}
+<header class="page-header">
+    <h1>Determinantes</h1>
+    <p>Calcula un determinante 3×3 mediante las seis diagonales de la regla de Sarrus.</p>
+</header>
+
+<form class="card" method="post" action="{{ url_for('sarrus') }}">
+    <h2>Matriz 3×3</h2>
+    <p class="hint" id="entrada">Admite valores decimales y negativos. Escribe 0 cuando una posición esté vacía.</p>
+    {% if error %}<p role="alert" class="alert">{{ error }}</p>{% endif %}
+    <div class="sarrus-input" aria-describedby="entrada">
+        {% for i in range(1, 4) %}
+            {% for j in range(1, 4) %}
+            <div>{{ campo('s' ~ i ~ j, 'a' ~ i ~ j) }}</div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    {{ controles(ejemplos, url_for('sarrus'), 'Calcular determinante') }}
+</form>
+
+{% if resultado %}
+<section class="card resultado" id="resultado" data-resultado>
+    <h2>Determinante</h2>
+    <p class="answer math">det A = {{ resultado.valor | numero }}</p>
+    {% if resultado.valor %}
+    <p>La transformación lineal escala el volumen por |det A| = {{ (resultado.valor | abs) | numero }}.
+        Su orientación {% if resultado.valor < 0 %}se invierte{% else %}se conserva{% endif %}.</p>
+    {% else %}
+    <p>La transformación colapsa al menos una dimensión. Sus columnas generan un volumen igual a cero.</p>
+    {% endif %}
+    <h3>Matriz original</h3>
+    {{ matriz(resultado.matriz, 'Matriz original') }}
+    <h3>Matriz extendida y diagonales</h3>
+    <p>Repite las columnas 1 y 2 a la derecha. El azul marca las diagonales descendentes y el naranja las ascendentes.</p>
+    {{ det(resultado, 'det A', true) }}
+</section>
+{% endif %}
+{% endblock %}

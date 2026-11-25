@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ titulo }} · Álgebra Visual</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% if grafica %}<script defer src="{{ url_for('plotly_js') }}"></script>{% endif %}
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+<body>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+    <div class="shell">
+        <aside class="sidebar">
+            <a class="brand" href="{{ url_for('index') }}">
+                <span class="brand-icon" aria-hidden="true">Σ</span>
+                <span>Álgebra <strong>Visual</strong></span>
+            </a>
+            <nav aria-label="Navegación principal">
+                <a href="{{ url_for('index') }}" {% if modulo == 'inicio' %}aria-current="page"{% endif %}>
+                    <span aria-hidden="true">⌂</span> Inicio
+                </a>
+                {% for clave, (nombre, simbolo, descripcion) in modulos.items() %}
+                <a href="{{ url_for(clave) }}" {% if modulo == clave %}aria-current="page"{% endif %}>
+                    <span aria-hidden="true">{{ simbolo }}</span> {{ nombre }}
+                </a>
+                {% endfor %}
+            </nav>
+        </aside>
+        <main id="contenido" class="contenido">
+            {% block contenido %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

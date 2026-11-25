@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "componentes.html" import campo, controles, matriz, tupla, producto, figura with context %}
+{% block contenido %}
+<header class="page-header">
+    <h1>{{ titulo }}</h1>
+    {% if es_cruz %}
+    <p>Desarrolla el determinante de u × v, verifica su perpendicularidad y explora el paralelogramo.</p>
+    {% else %}
+    <p>Calcula con dos vectores de ℝ{{ '²' if dimension == 2 else '³' }} y un escalar. Consulta las fórmulas y sus construcciones.</p>
+    {% endif %}
+</header>
+<form class="card" method="post" action="{{ url_for(modulo) }}">
+    <h2>Componentes de entrada</h2>
+    <p class="hint">Puedes escribir componentes negativas, decimales y cero.</p>
+    {% if error %}<p role="alert" class="alert">{{ error }}</p>{% endif %}
+    <div class="vector-inputs">
+        {% for nombre in 'uv' %}
+        <fieldset class="vector-fields" style="--dimension:{{ dimension }}">
+            <legend>Vector {{ nombre }}</legend>
+            {% for eje in variables[:dimension] %}
+            <div>{{ campo(nombre ~ eje, nombre ~ eje) }}</div>
+            {% endfor %}
+        </fieldset>
+        {% endfor %}
+        {% if not es_cruz %}
+        <fieldset class="scalar-field">
+            <legend>Escalar</legend>
+            {{ campo('k', 'k') }}
+        </fieldset>
+        {% endif %}
+    </div>
+    {{ controles(ejemplos, url_for(modulo), 'Calcular producto cruz' if es_cruz else 'Calcular operaciones') }}
+</form>
+{% if resultado %}
+    {% if es_cruz %}
+    {% include 'resultado_cruz.html' %}
+    {% else %}
+    {% include 'resultado_vectores.html' %}
+    {% endif %}
+{% endif %}
+{% endblock %}

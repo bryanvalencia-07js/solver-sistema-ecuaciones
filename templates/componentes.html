@@ -1,0 +1,109 @@
+{% macro campo(nombre, etiqueta, por_defecto='', signo=false) %}
+    <label class="entry-label" for="{{ nombre }}">{{ etiqueta }}</label>
+    <div class="entry-control">
+        {% if signo %}
+        {% set valor_signo = request.form.get('sign_' ~ nombre, '1') %}
+        <select name="sign_{{ nombre }}" aria-label="Signo de {{ etiqueta }}" data-signo>
+            <option value="1" {% if valor_signo == '1' %}selected{% endif %}>+</option>
+            <option value="-1" {% if valor_signo == '-1' %}selected{% endif %}>−</option>
+        </select>
+        {% endif %}
+        <input id="{{ nombre }}" name="{{ nombre }}" type="text" inputmode="decimal"
+               maxlength="64" required autocomplete="off" placeholder="{{ por_defecto or '0' }}"
+               data-numero {% if signo %}data-magnitud{% endif %}
+               value="{{ request.form.get(nombre, '') }}">
+    </div>
+{% endmacro %}
+
+{% macro controles(ejemplos, limpiar, texto) %}
+<div class="form-footer">
+    <div class="ejemplos" hidden>
+        <label for="ejemplo">Ejemplo precargado</label>
+        <select id="ejemplo" data-ejemplos>
+            <option value="">Selecciona un ejemplo</option>
+            {% for nombre in ejemplos %}<option value="{{ nombre }}">{{ nombre }}</option>{% endfor %}
+        </select>
+        <script type="application/json" data-datos-ejemplos>{{ ejemplos | tojson }}</script>
+    </div>
+    <div class="acciones">
+        <a class="button secondary" href="{{ limpiar }}">Limpiar</a>
+        <button class="button" type="submit">{{ texto }}</button>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro matriz(filas, etiqueta, aumentada=false, determinante=false) %}
+<div class="matrix-scroll">
+<table class="matrix{% if determinante %} determinant-matrix{% endif %}" aria-label="{{ etiqueta }}">
+    <tbody>
+    {% for fila in filas %}
+    <tr>
+        {% for celda in fila %}
+        <td {% if aumentada and loop.last %}class="rhs"{% endif %}>{{ celda | numero }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endmacro %}
+
+{% macro tupla(valores) -%}
+({% for valor in valores %}{{ valor | numero }}{% if not loop.last %}, {% endif %}{% endfor %})
+{%- endmacro %}
+
+{% macro producto(valores) -%}
+{% for valor in valores %}({{ valor | numero }}){% if not loop.last %} · {% endif %}{% endfor %}
+{%- endmacro %}
+
+{% macro det(detalle, nombre, extendida=false) %}
+<div class="detalle">
+    {% if extendida %}
+    <div class="sarrus-scroll">
+        <div class="sarrus-diagrama" role="group" aria-label="Matriz con las dos primeras columnas repetidas">
+            <svg viewBox="0 0 500 300" preserveAspectRatio="none" aria-hidden="true">
+                {% for x in (50, 150, 250) %}
+                <line x1="{{ x }}" y1="50" x2="{{ x + 200 }}" y2="250" class="desc"/>
+                <line x1="{{ x }}" y1="250" x2="{{ x + 200 }}" y2="50" class="asc"/>
+                {% endfor %}
+            </svg>
+            {% for fila in detalle.extendida %}
+                {% for valor in fila %}
+                <span class="{% if loop.index > 3 %}repetida{% endif %}"><b>{{ valor | numero }}</b></span>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div class="diagonal-grid">
+        {% for grupo, pasos, subtotal, clase in [
+            ('Descendentes', detalle.descendentes, detalle.suma_desc, 'desc'),
+            ('Ascendentes', detalle.ascendentes, detalle.suma_asc, 'asc')] %}
+        <div class="diagonal {{ clase }}">
+            <h4>{{ grupo }}</h4>
+            <ol>
+                {% for paso in pasos %}
+                <li class="math">{{ producto(paso.factores) }} = {{ paso.producto | numero }}</li>
+                {% endfor %}
+            </ol>
+            <p class="math">Suma =
+                {% for paso in pasos %}({{ paso.producto | numero }}){% if not loop.last %} + {% endif %}{% endfor %}
+                = <strong>{{ subtotal | numero }}</strong>
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+    <p class="math formula-result">{{ nombre }} = ({{ detalle.suma_desc | numero }}) − ({{ detalle.suma_asc | numero }}) = <strong>{{ detalle.valor | numero }}</strong></p>
+</div>
+{% endmacro %}
+
+{% macro figura(grafica, dimension, descripcion) %}
+<section class="card graph-card" aria-labelledby="grafica-titulo">
+    <h2 id="grafica-titulo">Representación geométrica</h2>
+    <p>{{ descripcion }}</p>
+    {% if dimension == 3 %}<p class="hint">Arrastra para rotar. Usa la rueda o los controles para acercar y alejar.</p>{% endif %}
+    <div class="grafica" role="group" aria-label="Gráfica matemática interactiva" data-grafica></div>
+    <script type="application/json" data-datos-grafica>{{ grafica | tojson }}</script>
+    <noscript><p>Activa JavaScript para explorar la gráfica interactiva.</p></noscript>
+</section>
+{% endmacro %}

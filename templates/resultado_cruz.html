@@ -1,0 +1,44 @@
+{% set r = resultado %}
+<section class="card resultado" id="resultado" data-resultado>
+    <h2>Producto vectorial</h2>
+    <p class="answer math">u × v = {{ tupla(r.vector) }}</p>
+    {% if r.nulo %}
+    <p>Al menos un vector es nulo. La construcción colapsa y el producto cruz es el vector cero.</p>
+    {% elif not r.area %}
+    <p>Los vectores son paralelos. El paralelogramo colapsa a un segmento, de modo que el producto cruz es el vector cero y no fija una normal.</p>
+    {% else %}
+    <p>El resultado es perpendicular al plano. Para aplicar la regla de la mano derecha, curva los dedos desde u hacia v por el menor ángulo. El pulgar indica el sentido de u × v.</p>
+    {% endif %}
+    <h3>Desarrollo por cofactores</h3>
+    {{ matriz([['i', 'j', 'k'], r.u, r.v], 'Determinante del producto cruz', determinante=true) }}
+    <p class="math">i(u<sub>y</sub>v<sub>z</sub> − u<sub>z</sub>v<sub>y</sub>) − j(u<sub>x</sub>v<sub>z</sub> − u<sub>z</sub>v<sub>x</sub>) + k(u<sub>x</sub>v<sub>y</sub> − u<sub>y</sub>v<sub>x</sub>)</p>
+    <ol class="steps compact">
+        {% for paso in r.componentes %}
+        {% set negativo = paso.signo < 0 %}
+        <li class="math">{{ 'ijk'[loop.index0] }}:
+            {{ '−' if negativo else '' }}[{{ producto(paso.factores_p) }} − {{ producto(paso.factores_q) }}]
+            = {{ '−' if negativo else '' }}[({{ paso.p | numero }}) − ({{ paso.q | numero }})]
+            = {{ '−' if negativo else '' }}({{ (paso.p - paso.q) | numero }})
+            = <strong>{{ paso.valor | numero }}</strong>
+        </li>
+        {% endfor %}
+    </ol>
+    <h3>Norma y áreas</h3>
+    <ul class="component-list">
+        <li class="math">‖u × v‖ = √({% for valor in r.vector %}({{ valor | numero }})²{% if not loop.last %} + {% endif %}{% endfor %}) =
+            √({{ r.norma_cuadrada | numero }}) ≈ <strong>{{ r.area | numero }}</strong></li>
+        <li class="math">Área del paralelogramo = ‖u × v‖ ≈ <strong>{{ r.area | numero }}</strong></li>
+        <li class="math">Área del triángulo = √({{ r.norma_cuadrada | numero }}) / 2 ≈ <strong>{{ r.triangulo | numero }}</strong></li>
+    </ul>
+    <h3>Verificación de perpendicularidad</h3>
+    <ul class="component-list">
+        {% for nombre, vec, punto in [('u', r.u, r.ortogonal_u), ('v', r.v, r.ortogonal_v)] %}
+        <li class="math">{{ nombre }} · (u × v) =
+            {% for valor in vec %}{{ producto([valor, r.vector[loop.index0]]) }}{% if not loop.last %} + {% endif %}{% endfor %}
+            = <strong>{{ punto | numero }}</strong>
+        </li>
+        {% endfor %}
+    </ul>
+    {% if not r.area %}<p>Los productos punto se anulan al multiplicar por el vector cero. El ángulo con el vector cero queda indefinido.</p>{% endif %}
+</section>
+{{ figura(grafica, 3, 'El paralelogramo se apoya sobre u y v. Cuando el producto cruz es distinto de cero, la flecha verde muestra su vector normal.') }}

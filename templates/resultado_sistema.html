@@ -1,0 +1,199 @@
+{% set r = resultado %}
+{% set estados = {
+    'unica': 'Compatible determinado',
+    'infinitas': 'Compatible indeterminado',
+    'sin_solucion': 'Incompatible'
+} %}
+{% set objeto = 'rectas' if dimension == 2 else 'planos' %}
+{% set num_degeneradas = r.degeneradas | length %}
+<section class="card resultado" id="resultado" data-resultado aria-labelledby="estado">
+    <h2 id="estado">{{ estados[r.estado] }}</h2>
+    {% if r.estado == 'unica' %}
+    <p class="answer math">
+        {% for expresion in r.expresiones %}
+        {{ variables[loop.index0] }} = {{ expresion | afin }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    {% elif r.estado == 'infinitas' %}
+    <p class="answer">Infinitas soluciones</p>
+    <p>Variables libres:
+        {% for indice in r.libres %}
+        <span class="math">{{ variables[indice] }} = t{{ loop.index }} ∈ ℝ</span>{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    <p class="math">
+        {% for expresion in r.expresiones %}
+        {{ variables[loop.index0] }} = {{ expresion | afin }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    {% else %}
+    <p class="answer">Ninguna solución</p>
+    {% for fila, valores in r.incompatibles %}
+    <p>La fila F{{ fila }} implica <strong class="math">0 = {{ valores[-1] | numero }}</strong>.
+        Sus coeficientes son todos cero y su término independiente es distinto de cero.</p>
+    {% endfor %}
+    {% endif %}
+    {% for i, rhs in r.degeneradas %}
+    <p>Ecuación {{ i }}:
+        {% if rhs %}
+        incompatible. La igualdad <span class="math">0 = {{ rhs | numero }}</span> carece de soluciones.
+        {% else %}
+        redundante. La igualdad <span class="math">0 = 0</span> se cumple para todo valor de las incógnitas.
+        {% endif %}
+    </p>
+    {% endfor %}
+    <div class="stats">
+        <div><span>Rango de A</span><strong>{{ r.rango_a }}</strong></div>
+        <div><span>Rango de [A | b]</span><strong>{{ r.rango_ampliada }}</strong></div>
+        <div><span>Determinante</span><strong>{{ r.determinante.valor | numero }}</strong></div>
+    </div>
+    <div class="matrix-grid">
+        <div><h3>Matriz A</h3>{{ matriz(r.a, 'Matriz de coeficientes A') }}</div>
+        <div><h3>Matriz aumentada [A | b]</h3>{{ matriz(r.aumentada, 'Matriz aumentada inicial', true) }}</div>
+    </div>
+</section>
+
+{% set descripcion %}
+    {% if r.estado == 'unica' %}
+        Las {{ 'dos rectas' if dimension == 2 else 'tres ecuaciones de plano' }} tienen un único punto común.
+    {% elif r.estado == 'sin_solucion' %}
+        {% if dimension == 2 and not num_degeneradas %}
+        Las rectas son paralelas y distintas. Carecen de punto común.
+        {% elif num_degeneradas %}
+        Una ecuación imposible impide la intersección común. La gráfica muestra las ecuaciones que sí definen {{ objeto }}.
+        {% else %}
+        Los planos carecen de intersección común. Algunos pares pueden cortarse aunque el sistema sea incompatible.
+        {% endif %}
+    {% elif r.libres | length == dimension %}
+        Todo el {{ 'plano' if dimension == 2 else 'espacio' }} satisface las ecuaciones.
+    {% elif dimension == 2 and not num_degeneradas %}
+        Las rectas coinciden. Todos los puntos de esa recta satisfacen ambas ecuaciones.
+    {% elif r.libres | length == 1 %}
+        Las ecuaciones comparten una recta. Cada punto de la recta es una solución.
+    {% else %}
+        Las ecuaciones comparten un plano. Cada punto del plano es una solución.
+    {% endif %}
+{% endset %}
+{{ figura(grafica, dimension, descripcion | trim) }}
+
+{% if r.metodo == 'cramer' %}
+<section class="card">
+    <h2>Regla de Cramer</h2>
+    <p>Usa A para D y reemplaza una columna a la vez por el vector b para obtener los determinantes auxiliares.</p>
+    {% if not r.determinante.valor %}
+    <p class="alert">D = 0. Las divisiones de Cramer quedan indefinidas. La eliminación de Gauss determina la clasificación.</p>
+    {% endif %}
+    <div class="cramer-list">
+        <details open>
+            <summary>D = {{ r.determinante.valor | numero }}</summary>
+            <div class="details-body">
+                {{ matriz(r.a, 'Matriz principal A') }}
+                {{ det(r.determinante, 'D', dimension == 3) }}
+            </div>
+        </details>
+        {% for d in r.cramer %}
+        <details open>
+            <summary>D{{ d.variable }} = {{ d.valor | numero }}</summary>
+            <div class="details-body">
+                <p>Se reemplaza la columna {{ loop.index }} ({{ d.variable }}) por <span class="math">b = ({{ r.b | map('numero') | join(', ') }})</span>.</p>
+                {{ matriz(d.matriz, 'Matriz para D' ~ d.variable) }}
+                {{ det(d, 'D' ~ d.variable, dimension == 3) }}
+                {% if d.cociente is not none %}
+                <p class="math formula-result">{{ d.variable }} = D{{ d.variable }} / D = ({{ d.valor | numero }}) / ({{ r.determinante.valor | numero }}) = <strong>{{ d.cociente | numero }}</strong></p>
+                {% endif %}
+            </div>
+        </details>
+        {% endfor %}
+    </div>
+</section>
+{% elif r.metodo == 'numpy' %}
+<section class="card">
+    <h2>NumPy Solve</h2>
+    {% if r.numpy and r.numpy.valores is not none %}
+    <p><code>numpy.linalg.solve(A, b)</code> devuelve <strong class="math">({{ r.numpy.valores | map('numero') | join(', ') }})</strong>.</p>
+    {% elif r.estado == 'unica' %}
+    <p>NumPy no pudo resolver la aproximación en punto flotante. El cálculo exacto de Gauss se muestra a continuación.</p>
+    {% else %}
+    <p>NumPy Solve requiere una matriz invertible. La eliminación de Gauss determina la clasificación del sistema singular.</p>
+    {% endif %}
+</section>
+{% endif %}
+
+<section class="card">
+    <h2>Eliminación de Gauss</h2>
+    <p>En cada columna, elige el pivote de mayor valor absoluto entre las filas disponibles y elimina los términos que quedan debajo. Al final normaliza los pivotes.</p>
+    {% if r.pasos %}
+    <ol class="steps">
+        {% for paso in r.pasos %}
+        <li>
+            <h3 class="math">
+                {% if paso.tipo == 'intercambio' %}
+                F{{ paso.fila }} ↔ F{{ paso.otra }}
+                {% elif paso.tipo == 'escala' %}
+                F{{ paso.fila }} ← ({{ paso.factor | numero }}) F{{ paso.fila }}
+                {% else %}
+                F{{ paso.fila }} ← F{{ paso.fila }} {{ '+' if paso.factor < 0 else '−' }} ({{ (paso.factor | abs) | numero }}) F{{ paso.otra }}
+                {% endif %}
+            </h3>
+            {{ matriz(paso.matriz, 'Matriz aumentada después del paso ' ~ loop.index, true) }}
+        </li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p>La matriz inicial ya está escalonada y sus pivotes, si existen, son 1.</p>
+    {% endif %}
+    <h3>Matriz escalonada final</h3>
+    {{ matriz(r.escalonada, 'Matriz escalonada final', true) }}
+    {% if r.estado != 'sin_solucion' %}
+    <h3>Sustitución regresiva</h3>
+    {% if r.regresiva %}
+    <ol class="steps compact">
+        {% for paso in r.regresiva %}
+        {% set x = variables[paso.variable] %}
+        <li>
+            <p class="math">({{ paso.pivote | numero }}){{ x }}
+                {% for factor, indice, expresion in paso.terminos %}
+                + ({{ factor | numero }}){{ variables[indice] }}
+                {% endfor %}
+                = {{ paso.rhs | numero }}
+            </p>
+            <p class="math">{{ x }} = [{{ paso.rhs | numero }}
+                {% for factor, indice, expresion in paso.terminos %}
+                − ({{ factor | numero }})({{ expresion | afin }})
+                {% endfor %}
+                ] / ({{ paso.pivote | numero }})
+                = ({{ paso.numerador | afin }}) / ({{ paso.pivote | numero }})
+                = <strong>{{ paso.expresion | afin }}</strong>
+            </p>
+        </li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p>Todas las variables son libres. No hay incógnitas dependientes que despejar.</p>
+    {% endif %}
+    {% endif %}
+</section>
+
+{% if r.verificacion is defined %}
+<section class="card">
+    <h2>Verificación en las ecuaciones originales</h2>
+    <ol class="steps compact">
+        {% for comprobacion in r.verificacion %}
+        {% set fila = loop.index0 %}
+        <li class="math">
+            {% for coeficiente in r.a[fila] %}
+            ({{ coeficiente | numero }})({{ r.expresiones[loop.index0] | afin }}){% if not loop.last %} + {% endif %}
+            {% endfor %}
+            = {{ comprobacion.expresion | afin }} = {{ comprobacion.rhs | numero }}
+        </li>
+        {% endfor %}
+    </ol>
+    {% if r.numpy %}
+        {% if r.numpy.coincide %}
+        <p>El resultado exacto coincide con <code>numpy.linalg.solve</code> con error relativo máximo de 10⁻⁹.</p>
+        {% else %}
+        <p>El contraste con NumPy difiere o no está disponible en punto flotante. Las igualdades de arriba verifican el resultado exacto.</p>
+        {% endif %}
+    {% endif %}
+</section>
+{% endif %}

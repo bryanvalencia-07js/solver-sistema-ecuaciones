@@ -1,0 +1,94 @@
+{% set r = resultado %}
+<section class="card resultado" id="resultado" data-resultado>
+    <h2>Resultados</h2>
+    <p class="answer math">u = {{ tupla(r.u) }} &nbsp; v = {{ tupla(r.v) }} &nbsp; k = {{ r.k | numero }}</p>
+    {% if r.nulo %}<p>Al menos un vector es nulo. Por eso el ángulo es indefinido y el área se reduce a cero.</p>{% endif %}
+    {% if r.paralelos %}<p>Los vectores son paralelos: generan un paralelogramo de área cero.</p>{% endif %}
+    {% if r.perpendiculares %}<p>Los vectores son perpendiculares: su producto punto es cero y forman 90°.</p>{% endif %}
+    <div class="operation-grid">
+        {% for nombre, formula, signo, valores, explicacion in [
+            ('Suma', 'uᵢ + vᵢ', '+', r.suma, 'u + v es la diagonal del paralelogramo con lados u y v.'),
+            ('Resta', 'uᵢ − vᵢ', '−', r.resta, 'u − v apunta de la punta de v a la punta de u cuando ambos parten del origen.')] %}
+        <article class="operation">
+            <h3>{{ nombre }}</h3>
+            <p class="math">{{ formula }} en cada componente</p>
+            <ol class="component-list">
+                {% for valor in valores %}
+                <li class="math">{{ variables[loop.index0] }}:
+                    ({{ r.u[loop.index0] | numero }}) {{ signo }} ({{ r.v[loop.index0] | numero }}) = {{ valor | numero }}</li>
+                {% endfor %}
+            </ol>
+            <p class="math formula-result">Resultado = <strong>{{ tupla(valores) }}</strong></p>
+            <p>{{ explicacion }}</p>
+        </article>
+        {% endfor %}
+        <article class="operation">
+            <h3>Multiplicación por escalar</h3>
+            <p class="math">k · uᵢ en cada componente</p>
+            <ol class="component-list">
+                {% for valor in r.escalado %}
+                <li class="math">{{ variables[loop.index0] }}:
+                    {{ producto([r.k, r.u[loop.index0]]) }} = {{ valor | numero }}</li>
+                {% endfor %}
+            </ol>
+            <p class="math formula-result">ku = <strong>{{ tupla(r.escalado) }}</strong></p>
+            <p>
+                {% if not r.k or not r.cuadrado_u %}El resultado es el vector nulo.
+                {% elif r.k < 0 %}Se escala la longitud por |k| y se invierte el sentido.
+                {% else %}Se escala la longitud por k y se conserva el sentido.{% endif %}
+            </p>
+        </article>
+        {% for nombre, vector, cuadrado, norma in [
+            ('u', r.u, r.cuadrado_u, r.norma_u), ('v', r.v, r.cuadrado_v, r.norma_v)] %}
+        <article class="operation">
+            <h3>Norma de {{ nombre }}</h3>
+            <p class="math">‖{{ nombre }}‖ = √(Σ {{ nombre }}ᵢ²)</p>
+            <p class="math">√({% for valor in vector %}({{ valor | numero }})²{% if not loop.last %} + {% endif %}{% endfor %})</p>
+            <p class="math formula-result">‖{{ nombre }}‖ = √({{ cuadrado | numero }}) ≈ <strong>{{ norma | numero }}</strong></p>
+            <p>Es la distancia desde el origen hasta el extremo de {{ nombre }}.</p>
+        </article>
+        {% endfor %}
+        <article class="operation">
+            <h3>Producto punto</h3>
+            <p class="math">u · v = Σ uᵢvᵢ</p>
+            <p class="math">{% for valor in r.u %}{{ producto([valor, r.v[loop.index0]]) }}{% if not loop.last %} + {% endif %}{% endfor %}</p>
+            <p class="math formula-result">u · v = <strong>{{ r.dot | numero }}</strong></p>
+            <p>
+                {% if r.nulo %}El producto es cero porque uno de los vectores es nulo.
+                {% elif r.dot > 0 %}La proyección de un vector sobre el otro apunta en el mismo sentido.
+                {% elif r.dot < 0 %}La proyección apunta en sentido opuesto.
+                {% else %}La proyección es cero. Los vectores son ortogonales.{% endif %}
+            </p>
+        </article>
+        <article class="operation">
+            <h3>Ángulo</h3>
+            <p class="math">θ = atan2(área, u · v)</p>
+            {% if r.angulo is none %}
+            <p class="math formula-result">θ <strong>indefinido</strong></p>
+            <p>Un vector nulo carece de dirección. La expresión requeriría atan2(0, 0).</p>
+            {% else %}
+            <p class="math">atan2({{ r.area | numero }}, {{ r.dot | numero }}) · 180° / π</p>
+            <p class="math formula-result">θ ≈ <strong>{{ r.angulo | numero }}°</strong></p>
+            <p>Es la abertura entre los vectores cuando parten del mismo origen, de 0° a 180°.</p>
+            {% endif %}
+        </article>
+        <article class="operation">
+            <h3>Área del paralelogramo</h3>
+            {% if dimension == 2 %}
+            <p class="math">Área = |uₓvᵧ − uᵧvₓ|</p>
+            <p class="math">|{{ producto([r.u[0], r.v[1]]) }} − {{ producto([r.u[1], r.v[0]]) }}|
+                = |{{ r.determinante | numero }}|</p>
+            {% else %}
+            <p class="math">Área = ‖u × v‖</p>
+            <p class="math">u × v =
+                ({% for paso in r.cruz.componentes %}{{ '−' if paso.signo < 0 else '' }}[{{ producto(paso.factores_p) }} − {{ producto(paso.factores_q) }}]{% if not loop.last %}, {% endif %}{% endfor %})
+                = {{ tupla(r.cruz.vector) }}</p>
+            <p class="math">√({% for valor in r.cruz.vector %}({{ valor | numero }})²{% if not loop.last %} + {% endif %}{% endfor %})
+                = √({{ r.cruz.norma_cuadrada | numero }})</p>
+            {% endif %}
+            <p class="math formula-result">Área {{ '=' if dimension == 2 else '≈' }} <strong>{{ r.area | numero }}</strong></p>
+            <p>Mide la superficie delimitada por u, v y sus traslaciones.</p>
+        </article>
+    </div>
+</section>
+{{ figura(grafica, dimension, 'Usa el selector de la gráfica para alternar entre suma, resta y multiplicación por escalar.') }}

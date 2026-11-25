@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "componentes.html" import campo, controles, matriz, det, producto, figura with context %}
+{% block contenido %}
+<header class="page-header">
+    <h1>Sistemas de ecuaciones</h1>
+    <p>Resuelve Ax = b y relaciona las operaciones de fila con la intersección de rectas o planos.</p>
+</header>
+<form class="card" method="post" action="{{ url_for('sistemas') }}">
+    <div class="form-heading">
+        <div>
+            <h2>Coeficientes del sistema</h2>
+            <div class="segmentado" role="group" aria-label="Dimensión del sistema">
+                {% for n in (2, 3) %}
+                <a href="{{ url_for('sistemas', dimension=n) }}" {% if dimension == n %}aria-current="true"{% endif %}>{{ n }}×{{ n }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="metodo">
+            <label for="metodo">Método de resolución</label>
+            <select name="metodo" id="metodo">
+                {% for clave, nombre in metodos.items() %}
+                <option value="{{ clave }}" {% if metodo == clave %}selected{% endif %}>{{ nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <input type="hidden" name="dimension" value="{{ dimension }}">
+    <p class="hint">Selecciona el signo y escribe la magnitud. Usa 0 si una variable no aparece.</p>
+    {% if error %}<p role="alert" class="alert">{{ error }}</p>{% endif %}
+    <div class="ecuaciones">
+        {% for i in range(1, dimension + 1) %}
+        <fieldset class="ecuacion" style="--dimension:{{ dimension }}">
+            <legend>Ecuación {{ i }}</legend>
+            {% for variable in variables[:dimension] %}
+                <div>{{ campo('a' ~ i ~ loop.index, 'Coeficiente de ' ~ variable, signo=true) }}</div>
+            {% endfor %}
+            <span class="equals" aria-hidden="true">=</span>
+            <div>{{ campo('b' ~ i, 'Término independiente', signo=true) }}</div>
+        </fieldset>
+        {% endfor %}
+    </div>
+    {{ controles(ejemplos, url_for('sistemas', dimension=dimension), 'Resolver sistema') }}
+</form>
+{% if resultado %}
+    {% include "resultado_sistema.html" %}
+{% endif %}
+{% endblock %}
